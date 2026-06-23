@@ -22,6 +22,10 @@ kbo-csv-importer -driver="sqlite" --dsn="file:mydb.db?cache=shared&mode=rwc" --v
 kbo-csv-importer -driver="postgres" --dsn="postgres://kbo:kbopassword@localhost:5432/kbo" --verbose --overwrite  kbo2.sqlite storage/impor
 ```
 
+### Binaries
+
+Download prebuilt binaries from the [releases page](https://github.com/beyto1974/kbo-csv-importer/releases).
+
 ## Required CSV Files
 
 ```
