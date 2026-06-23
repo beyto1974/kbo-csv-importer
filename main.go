@@ -9,13 +9,16 @@ import (
 )
 
 func main() {
-	fmt.Println("KBO CSV Importer")
-
 	config := parseConfig()
-	fmt.Printf("\nConfiguration:\n")
-	fmt.Printf("  Data Dir:   %s\n", config.DataDir)
-	fmt.Printf("  Overwrite:  %v\n", config.Overwrite)
-	fmt.Printf("  Verbose:    %v\n\n", config.Verbose)
+
+	if config.Verbose {
+		fmt.Println("KBO CSV Importer")
+
+		fmt.Printf("\nConfiguration:\n")
+		fmt.Printf("  Data Dir:   %s\n", config.DataDir)
+		fmt.Printf("  Overwrite:  %v\n", config.Overwrite)
+		fmt.Printf("  Verbose:    %v\n\n", config.Verbose)
+	}
 
 	db, err := connectDB(config)
 	if err != nil {
