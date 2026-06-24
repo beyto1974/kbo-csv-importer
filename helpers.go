@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 	"unicode"
@@ -42,4 +44,45 @@ func progressBar(current, total, width int) string {
 		strings.Repeat("#", filled),
 		strings.Repeat("-", width-filled),
 		pct, current, total)
+}
+
+func printProgressBar(verbose bool, rowNum int, total int, lastShown int, newline bool) {
+	if !verbose {
+		return
+	}
+
+	p := ((rowNum + 1) * 100) / total
+	if p != lastShown && (p == 100 || p%2 == 0) {
+		fmt.Printf("\r  Progress: %s", progressBar(rowNum+1, total, 20))
+		lastShown = p
+	}
+
+	if newline {
+		fmt.Println()
+	}
+}
+
+func countLines(path string) (int, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return 0, err
+	}
+	defer f.Close()
+
+	buf := make([]byte, 32*1024)
+	nLines := 0
+
+	for {
+		n, err := f.Read(buf)
+		nLines += bytes.Count(buf[:n], []byte{'\n'})
+
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	return nLines, nil
 }

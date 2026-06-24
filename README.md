@@ -5,11 +5,12 @@ Imports Belgian KBO CSV dumps into SQLite, PostgreSQL, and MySQL.
 ## Usage
 
 ```bash
-./kbo-importer --driver=<sqlite|postgres|mysql> --dsn=<dsn> [--overwrite] [--verbose] <csv-dumps-path>
+./kbo-importer --driver=<sqlite|postgres|mysql> --dsn=<dsn> [--batchSize=<batchSize?>] [--overwrite] [--verbose] <csv-dumps-path>
 ```
 
 - `--driver`: Database driver to use (`sqlite`, `postgres`, or `mysql`)
 - `--dsn`: Database connection string
+- `--batchSize`: Defaults to 500
 - `--overwrite`: Delete existing data before import (truncate)
 - `--verbose`: Show progress bar
 - `<sqlite-db-path>`: Kept for compatibility if your command still accepts it
@@ -18,8 +19,8 @@ Imports Belgian KBO CSV dumps into SQLite, PostgreSQL, and MySQL.
 Example usage:
 
 ```bash
-kbo-csv-importer -driver="sqlite" --dsn="file:mydb.db?cache=shared&mode=rwc" --verbose --overwrite --testRun
-kbo-csv-importer -driver="postgres" --dsn="postgres://kbo:kbopassword@localhost:5432/kbo" --verbose --overwrite  kbo2.sqlite storage/impor
+kbo-csv-importer -driver="sqlite" --dsn="file:mydb.db?cache=shared&mode=rwc" --verbose --overwrite storage/import
+kbo-csv-importer -driver="postgres" --dsn="postgres://kbo:kbopassword@localhost:5432/kbo" --verbose --overwrite storage/import
 ```
 
 ### Binaries
