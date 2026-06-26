@@ -1,16 +1,37 @@
-package main
+package db
 
 import (
 	"github.com/uptrace/bun"
 )
 
 type Activity struct {
-	bun.BaseModel  `bun:"table:activity,alias:a"`
+	bun.BaseModel `bun:"table:activity,alias:a"`
+
 	EntityNumber   string `bun:"entity_number"`
 	ActivityGroup  string `bun:"activity_group"`
 	NaceVersion    string `bun:"nace_version"`
 	NaceCode       string `bun:"nace_code"`
 	Classification string `bun:"classification"`
+
+	ActivityGroupCode struct {
+		Code        string `bun:"code"`
+		Description string `bun:"description"`
+	} `bun:",scanonly"`
+
+	NaceVersionCode struct {
+		Code        string `bun:"code"`
+		Description string `bun:"description"`
+	} `bun:",scanonly"`
+
+	NaceCodeCode struct {
+		Code        string `bun:"code"`
+		Description string `bun:"description"`
+	} `bun:",scanonly"`
+
+	ClassificationCode struct {
+		Code        string `bun:"code"`
+		Description string `bun:"description"`
+	} `bun:",scanonly"`
 }
 
 type Address struct {
@@ -28,6 +49,11 @@ type Address struct {
 	Box              string       `bun:"box"`
 	ExtraAddressInfo string       `bun:"extra_address_info"`
 	DateStrikingOff  bun.NullTime `bun:"date_striking_off"`
+
+	TypeOfAddressCode struct {
+		Code        string `bun:"code"`
+		Description string `bun:"description"`
+	} `bun:",scanonly"`
 }
 
 type Branch struct {
@@ -51,6 +77,11 @@ type Contact struct {
 	EntityContact string `bun:"entity_contact"`
 	ContactType   string `bun:"contact_type"`
 	Value         string `bun:"value"`
+
+	ContactTypeCode struct {
+		Code        string `bun:"code"`
+		Description string `bun:"description"`
+	} `bun:",scanonly"`
 }
 
 type Denomination struct {
@@ -59,6 +90,11 @@ type Denomination struct {
 	Language           string  `bun:"language"`
 	TypeOfDenomination string  `bun:"type_of_denomination"`
 	Denomination       *string `bun:"denomination,nullzero"`
+
+	TypeOfDenominationCode struct {
+		Code        string `bun:"code"`
+		Description string `bun:"description"`
+	} `bun:",scanonly"`
 }
 
 type Enterprise struct {
@@ -70,6 +106,31 @@ type Enterprise struct {
 	JuridicalForm      string       `bun:"juridical_form"`
 	JuridicalFormCac   string       `bun:"juridical_form_cac"`
 	StartDate          bun.NullTime `bun:"start_date"`
+
+	StatusCode struct {
+		Code        string `bun:"code"`
+		Description string `bun:"description"`
+	} `bun:",scanonly"`
+
+	JuridicalSituationCode struct {
+		Code        string `bun:"code"`
+		Description string `bun:"description"`
+	} `bun:",scanonly"`
+
+	TypeOfEnterpriseCode struct {
+		Code        string `bun:"code"`
+		Description string `bun:"description"`
+	} `bun:",scanonly"`
+
+	JuridicalFormCode struct {
+		Code        string `bun:"code"`
+		Description string `bun:"description"`
+	} `bun:",scanonly"`
+
+	JuridicalFormCacCode struct {
+		Code        string `bun:"code"`
+		Description string `bun:"description"`
+	} `bun:",scanonly"`
 }
 
 type Establishment struct {

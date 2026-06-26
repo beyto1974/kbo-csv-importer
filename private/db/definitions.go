@@ -1,6 +1,6 @@
-package main
+package db
 
-const createTableQueries = `
+const CreateTableQueries = `
 CREATE TABLE IF NOT EXISTS activity (
     entity_number      VARCHAR(50),
     activity_group     VARCHAR(100),
@@ -79,7 +79,15 @@ type TableConfig struct {
 	CSVFile string
 }
 
-func getImportOrder() []string {
+func GetTableMap() map[string]TableConfig {
+	tableMap := map[string]TableConfig{}
+	for _, t := range tables {
+		tableMap[t.Name] = t
+	}
+	return tableMap
+}
+
+func GetImportOrder() []string {
 	return []string{
 		"meta",
 		"code",

@@ -10,6 +10,9 @@ import (
 	"strings"
 	"time"
 
+	"beyto1974/kbo-csv-importer/private/db"
+	"beyto1974/kbo-csv-importer/private/importer_config"
+
 	"github.com/uptrace/bun"
 )
 
@@ -61,15 +64,15 @@ func field(rec []string, idx int) string {
 	return rec[idx]
 }
 
-func insertBatch[T any](ctx context.Context, db bun.IDB, batch []T) error {
+func insertBatch[T any](ctx context.Context, bunDB bun.IDB, batch []T) error {
 	if len(batch) == 0 {
 		return nil
 	}
-	_, err := db.NewInsert().Model(&batch).Exec(ctx)
+	_, err := bunDB.NewInsert().Model(&batch).Exec(ctx)
 	return err
 }
 
-func importTable(db *bun.DB, table TableConfig, config Config) error {
+func importTable(bunDB *bun.DB, table db.TableConfig, config importer_config.Config) error {
 	csvPath := filepath.Join(config.DataDir, table.CSVFile)
 
 	f, err := os.Open(csvPath)
@@ -89,7 +92,7 @@ func importTable(db *bun.DB, table TableConfig, config Config) error {
 	}
 
 	ctx := context.Background()
-	tx, err := db.BeginTx(ctx, nil)
+	tx, err := bunDB.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %w", err)
 	}
@@ -120,7 +123,7 @@ func importTable(db *bun.DB, table TableConfig, config Config) error {
 
 	switch table.Name {
 	case "activity":
-		batch := make([]Activity, 0, batchSize)
+		batch := make([]db.Activity, 0, batchSize)
 		for {
 			rec, err := r.Read()
 			if err == io.EOF {
@@ -138,12 +141,12 @@ func importTable(db *bun.DB, table TableConfig, config Config) error {
 				return fmt.Errorf("row %d: expected 5 fields, got %d", rowNum, len(rec))
 			}
 
-			row := Activity{
-				EntityNumber:   field(rec, headerMap["entity_number"]),
-				ActivityGroup:  field(rec, headerMap["activity_group"]),
-				NaceVersion:    field(rec, headerMap["nace_version"]),
-				NaceCode:       field(rec, headerMap["nace_code"]),
-				Classification: field(rec, headerMap["classification"]),
+			row := db.Activity{
+				EntityNumber:   field(rec, headerMap["EntityNumber"]),
+				ActivityGroup:  field(rec, headerMap["ActivityGroup"]),
+				NaceVersion:    field(rec, headerMap["NaceVersion"]),
+				NaceCode:       field(rec, headerMap["NaceCode"]),
+				Classification: field(rec, headerMap["Classification"]),
 			}
 			batch = append(batch, row)
 			if len(batch) >= batchSize {
@@ -164,7 +167,7 @@ func importTable(db *bun.DB, table TableConfig, config Config) error {
 		printProgressBar(config.Verbose, rowNum, totalRecords, lastShown, true)
 
 	case "address":
-		batch := make([]Address, 0, batchSize)
+		batch := make([]db.Address, 0, batchSize)
 		for {
 			rec, err := r.Read()
 			if err == io.EOF {
@@ -184,7 +187,7 @@ func importTable(db *bun.DB, table TableConfig, config Config) error {
 				return fmt.Errorf("row %d: %w", rowNum, err)
 			}
 
-			row := Address{
+			row := db.Address{
 				EntityNumber:     field(rec, headerMap["EntityNumber"]),
 				TypeOfAddress:    field(rec, headerMap["TypeOfAddress"]),
 				CountryNl:        field(rec, headerMap["CountryNL"]),
@@ -218,7 +221,7 @@ func importTable(db *bun.DB, table TableConfig, config Config) error {
 		printProgressBar(config.Verbose, rowNum, totalRecords, lastShown, true)
 
 	case "branch":
-		batch := make([]Branch, 0, batchSize)
+		batch := make([]db.Branch, 0, batchSize)
 		for {
 			rec, err := r.Read()
 			if err == io.EOF {
@@ -238,7 +241,7 @@ func importTable(db *bun.DB, table TableConfig, config Config) error {
 				return fmt.Errorf("row %d: %w", rowNum, err)
 			}
 
-			row := Branch{
+			row := db.Branch{
 				ID:               field(rec, headerMap["ID"]),
 				StartDate:        dt,
 				EnterpriseNumber: field(rec, headerMap["EnterpriseNumber"]),
@@ -262,7 +265,7 @@ func importTable(db *bun.DB, table TableConfig, config Config) error {
 		printProgressBar(config.Verbose, rowNum, totalRecords, lastShown, true)
 
 	case "code":
-		batch := make([]Code, 0, batchSize)
+		batch := make([]db.Code, 0, batchSize)
 		for {
 			rec, err := r.Read()
 			if err == io.EOF {
@@ -277,7 +280,7 @@ func importTable(db *bun.DB, table TableConfig, config Config) error {
 				break
 			}
 
-			row := Code{
+			row := db.Code{
 				Category:    field(rec, headerMap["Category"]),
 				Code:        field(rec, headerMap["Code"]),
 				Language:    field(rec, headerMap["Language"]),
@@ -302,7 +305,7 @@ func importTable(db *bun.DB, table TableConfig, config Config) error {
 		printProgressBar(config.Verbose, rowNum, totalRecords, lastShown, true)
 
 	case "contact":
-		batch := make([]Contact, 0, batchSize)
+		batch := make([]db.Contact, 0, batchSize)
 		for {
 			rec, err := r.Read()
 			if err == io.EOF {
@@ -317,7 +320,7 @@ func importTable(db *bun.DB, table TableConfig, config Config) error {
 				break
 			}
 
-			row := Contact{
+			row := db.Contact{
 				EntityNumber:  field(rec, headerMap["EntityNumber"]),
 				EntityContact: field(rec, headerMap["EntityContact"]),
 				ContactType:   field(rec, headerMap["ContactType"]),
@@ -342,7 +345,7 @@ func importTable(db *bun.DB, table TableConfig, config Config) error {
 		printProgressBar(config.Verbose, rowNum, totalRecords, lastShown, true)
 
 	case "denomination":
-		batch := make([]Denomination, 0, batchSize)
+		batch := make([]db.Denomination, 0, batchSize)
 		for {
 			rec, err := r.Read()
 			if err == io.EOF {
@@ -357,7 +360,7 @@ func importTable(db *bun.DB, table TableConfig, config Config) error {
 				break
 			}
 
-			row := Denomination{
+			row := db.Denomination{
 				EntityNumber:       field(rec, headerMap["EentityNumber"]),
 				Language:           field(rec, headerMap["Language"]),
 				TypeOfDenomination: field(rec, headerMap["TypeOfDenomination"]),
@@ -382,7 +385,7 @@ func importTable(db *bun.DB, table TableConfig, config Config) error {
 		printProgressBar(config.Verbose, rowNum, totalRecords, lastShown, true)
 
 	case "enterprise":
-		batch := make([]Enterprise, 0, batchSize)
+		batch := make([]db.Enterprise, 0, batchSize)
 		for {
 			rec, err := r.Read()
 			if err == io.EOF {
@@ -398,7 +401,7 @@ func importTable(db *bun.DB, table TableConfig, config Config) error {
 				return fmt.Errorf("row %d: %w", rowNum, err)
 			}
 
-			row := Enterprise{
+			row := db.Enterprise{
 				EnterpriseNumber:   field(rec, headerMap["EnterpriseNumber"]),
 				Status:             field(rec, headerMap["Status"]),
 				JuridicalSituation: field(rec, headerMap["JuridicalSituation"]),
@@ -426,7 +429,7 @@ func importTable(db *bun.DB, table TableConfig, config Config) error {
 		printProgressBar(config.Verbose, rowNum, totalRecords, lastShown, true)
 
 	case "establishment":
-		batch := make([]Establishment, 0, batchSize)
+		batch := make([]db.Establishment, 0, batchSize)
 		for {
 			rec, err := r.Read()
 			if err == io.EOF {
@@ -446,7 +449,7 @@ func importTable(db *bun.DB, table TableConfig, config Config) error {
 				return fmt.Errorf("row %d: %w", rowNum, err)
 			}
 
-			row := Establishment{
+			row := db.Establishment{
 				EstablishmentNumber: field(rec, headerMap["EstablishmentNumber"]),
 				StartDate:           dt,
 				EnterpriseNumber:    field(rec, headerMap["EnterpriseNumber"]),
@@ -470,7 +473,7 @@ func importTable(db *bun.DB, table TableConfig, config Config) error {
 		printProgressBar(config.Verbose, rowNum, totalRecords, lastShown, true)
 
 	case "meta":
-		batch := make([]Meta, 0, batchSize)
+		batch := make([]db.Meta, 0, batchSize)
 		for {
 			rec, err := r.Read()
 			if err == io.EOF {
@@ -485,7 +488,7 @@ func importTable(db *bun.DB, table TableConfig, config Config) error {
 				break
 			}
 
-			row := Meta{
+			row := db.Meta{
 				Variable: field(rec, headerMap["Variable"]),
 				Value:    field(rec, headerMap["Value"]),
 			}

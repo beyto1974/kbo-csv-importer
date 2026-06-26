@@ -1,4 +1,4 @@
-package main
+package db
 
 import (
 	"context"
@@ -15,28 +15,28 @@ import (
 	"github.com/uptrace/bun/schema"
 )
 
-func connectDB(config Config) (*bun.DB, error) {
-	switch config.Driver {
+func ConnectDB(driver string, dsn string) (*bun.DB, error) {
+	switch driver {
 	case "postgres", "postgresql", "pg":
-		sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(config.DSN)))
+		sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))
 		return openBunDB(sqldb, pgdialect.New(), "postgres")
 
 	case "mysql", "mariadb":
-		sqldb, err := sql.Open("mysql", config.DSN)
+		sqldb, err := sql.Open("mysql", dsn)
 		if err != nil {
 			return nil, fmt.Errorf("failed to open mysql database: %w", err)
 		}
 		return openBunDB(sqldb, mysqldialect.New(), "mysql")
 
 	case "sqlite", "sqlite3":
-		sqldb, err := sql.Open(sqliteshim.ShimName, config.DSN)
+		sqldb, err := sql.Open(sqliteshim.ShimName, dsn)
 		if err != nil {
 			return nil, fmt.Errorf("failed to open sqlite database: %w", err)
 		}
 		return openBunDB(sqldb, sqlitedialect.New(), "sqlite")
 
 	default:
-		return nil, fmt.Errorf("unsupported database driver: %s", config.Driver)
+		return nil, fmt.Errorf("unsupported database driver: %s", driver)
 	}
 }
 
@@ -47,7 +47,7 @@ func openBunDB(sqldb *sql.DB, dialect schema.Dialect, name string) (*bun.DB, err
 	return bun.NewDB(sqldb, dialect), nil
 }
 
-func clearTables(ctx context.Context, db *bun.DB, dialect string, tables []TableConfig) error {
+func ClearTables(ctx context.Context, db *bun.DB, dialect string) error {
 	for _, t := range tables {
 		var query string
 

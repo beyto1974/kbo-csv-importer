@@ -1,6 +1,8 @@
 package main
 
 import (
+	"beyto1974/kbo-csv-importer/private/db"
+	"beyto1974/kbo-csv-importer/private/importer_config"
 	"context"
 	"fmt"
 	"os"
@@ -9,7 +11,7 @@ import (
 )
 
 func main() {
-	config := parseConfig()
+	config := importer_config.ParseConfig()
 
 	if config.Verbose {
 		fmt.Println("KBO CSV Importer")
@@ -20,31 +22,28 @@ func main() {
 		fmt.Printf("  Verbose:    %v\n\n", config.Verbose)
 	}
 
-	db, err := connectDB(config)
+	bunDB, err := db.ConnectDB(config.Driver, config.DSN)
 	if err != nil {
 		fmt.Printf("Error connecting to database: %v\n", err)
 		os.Exit(1)
 	}
 
-	defer db.Close()
+	defer bunDB.Close()
 
 	ctx := context.Background()
 
 	if config.Overwrite {
-		clearTables(ctx, db, config.Driver, tables)
+		db.ClearTables(ctx, bunDB, config.Driver)
 	}
 
-	if _, err := db.ExecContext(context.Background(), createTableQueries); err != nil {
+	if _, err := bunDB.ExecContext(context.Background(), db.CreateTableQueries); err != nil {
 		panic(err)
 	}
 
 	// Import tables
-	tableMap := map[string]TableConfig{}
-	for _, t := range tables {
-		tableMap[t.Name] = t
-	}
+	tableMap := db.GetTableMap()
 
-	order := getImportOrder()
+	order := db.GetImportOrder()
 	totalTables, successfulTables := 0, 0
 
 	for _, name := range order {
@@ -54,7 +53,7 @@ func main() {
 		}
 		totalTables++
 		fmt.Printf("Importing table: %s (%s)\n", t.Name, t.CSVFile)
-		if err := importTable(db, t, config); err != nil {
+		if err := importTable(bunDB, t, config); err != nil {
 			fmt.Printf("  ERROR: %v\n", err)
 			fmt.Println("\nImport failed on error. Exiting.")
 			os.Exit(1)

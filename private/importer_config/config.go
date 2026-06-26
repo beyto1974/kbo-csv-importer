@@ -1,4 +1,4 @@
-package main
+package importer_config
 
 import (
 	"flag"
@@ -16,7 +16,7 @@ type Config struct {
 	TestRun   bool
 }
 
-func parseConfig() Config {
+func ParseConfig() Config {
 	flag.Usage = func() {
 		fmt.Printf("Usage: %s --driver=<sqlite|postgres|mysql> --dsn=<dns> [--overwrite] [--verbose] <csv-dumps-path>\n", os.Args[0])
 		flag.PrintDefaults()
