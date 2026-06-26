@@ -72,6 +72,87 @@ CREATE TABLE IF NOT EXISTS meta (
     variable VARCHAR(255),
     value    VARCHAR(100)
 );
+
+-- activity
+CREATE INDEX idx_activity_entity_number
+ON activity (entity_number);
+
+CREATE INDEX idx_activity_nace_code
+ON activity (nace_code);
+
+CREATE INDEX idx_activity_group_code
+ON activity (activity_group, nace_version, nace_code);
+
+-- address
+CREATE INDEX idx_address_entity_number
+ON address (entity_number);
+
+CREATE INDEX idx_address_zipcode
+ON address (zipcode);
+
+CREATE INDEX idx_address_municipality_nl
+ON address (municipality_nl);
+
+CREATE INDEX idx_address_municipality_fr
+ON address (municipality_fr);
+
+CREATE INDEX idx_address_type_entity
+ON address (type_of_address, entity_number);
+
+-- branch
+CREATE INDEX idx_branch_id
+ON branch (id);
+
+CREATE INDEX idx_branch_enterprise_number
+ON branch (enterprise_number);
+
+CREATE INDEX idx_branch_start_date
+ON branch (start_date);
+
+-- code
+CREATE INDEX idx_code_category_code_lang
+ON code (category, code, language);
+
+-- contact
+CREATE INDEX idx_contact_entity_number
+ON contact (entity_number);
+
+CREATE INDEX idx_contact_type_value
+ON contact (contact_type, value);
+
+-- denomination
+CREATE INDEX idx_denomination_entity_lang
+ON denomination (entity_number, language);
+
+CREATE INDEX idx_denomination_type
+ON denomination (type_of_denomination);
+
+-- enterprise
+CREATE INDEX idx_enterprise_number
+ON enterprise (enterprise_number);
+
+CREATE INDEX idx_enterprise_status
+ON enterprise (status);
+
+CREATE INDEX idx_enterprise_juridical_form
+ON enterprise (juridical_form);
+
+CREATE INDEX idx_enterprise_start_date
+ON enterprise (start_date);
+
+-- establishment
+CREATE INDEX idx_establishment_number
+ON establishment (establishment_number);
+
+CREATE INDEX idx_establishment_enterprise_number
+ON establishment (enterprise_number);
+
+CREATE INDEX idx_establishment_start_date
+ON establishment (start_date);
+
+-- meta
+CREATE UNIQUE INDEX idx_meta_variable
+ON meta (variable);
 `
 
 type TableConfig struct {
