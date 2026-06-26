@@ -20,6 +20,8 @@ Tools for working with Belgian KBO (Kruispuntbank van Ondernemingen) open data C
 - `--verbose`: Show progress bar
 - `<csv-dumps-path>`: Directory with CSV files
 
+On a decent computer/server, this operation takes less than 3 minutes.
+
 ### Examples
 
 ```bash
