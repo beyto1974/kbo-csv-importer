@@ -16,6 +16,25 @@ type Config struct {
 	TestRun   bool
 }
 
+func require(name, value string) error {
+	if value == "" {
+		return fmt.Errorf("missing required flag: -%s", name)
+	}
+	return nil
+}
+
+func validateConfig(cfg Config) error {
+	for _, check := range []error{
+		require("dsn", cfg.DSN),
+		require("driver", cfg.Driver),
+	} {
+		if check != nil {
+			return check
+		}
+	}
+	return nil
+}
+
 func ParseConfig() Config {
 	flag.Usage = func() {
 		fmt.Printf("Usage: %s --driver=<sqlite|postgres|mysql> --dsn=<dns> [--overwrite] [--verbose] <csv-dumps-path>\n", os.Args[0])
@@ -31,27 +50,15 @@ func ParseConfig() Config {
 
 	flag.Parse()
 
-	if *dsn == "" {
-		fmt.Fprintln(os.Stderr, "missing required flag: -dsn")
-		flag.Usage()
-		os.Exit(2)
-	}
-
-	if *driver == "" {
-		fmt.Fprintln(os.Stderr, "missing required flag: -driver")
-		flag.Usage()
-		os.Exit(2)
-	}
-
 	args := flag.Args()
 	if len(args) < 1 {
 		flag.Usage()
-		os.Exit(1)
+		os.Exit(2)
 	}
 
 	dataDir := args[0]
 
-	return Config{
+	cfg := Config{
 		DataDir:   dataDir,
 		DSN:       *dsn,
 		BatchSize: *batchSize,
@@ -60,4 +67,12 @@ func ParseConfig() Config {
 		Verbose:   *verbose,
 		TestRun:   *testRun,
 	}
+
+	if err := validateConfig(cfg); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		flag.Usage()
+		os.Exit(2)
+	}
+
+	return cfg
 }
