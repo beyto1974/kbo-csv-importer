@@ -33,7 +33,7 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - name: Build
+      - name: Build importer
         shell: bash
         env:
           GOOS: ${{ matrix.goos }}
@@ -42,12 +42,22 @@ jobs:
         run: |
           mkdir -p dist
           BIN="kbo-csv-importer-${VERSION}-${GOOS}-amd64${{ matrix.ext }}"
-          go build -o "dist/$BIN" .
+          go build -o "dist/$BIN" ./private/importer/
 
-      - name: Upload artifact
+      - name: Build explorer
+        shell: bash
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: amd64
+          VERSION: ${{ github.ref_name }}
+        run: |
+          BIN="kbo-explorer-${VERSION}-${GOOS}-amd64${{ matrix.ext }}"
+          go build -o "dist/$BIN" ./private/explorer/
+
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: kbo-csv-importer-${{ github.ref_name }}-${{ matrix.goos }}-amd64
+          name: binaries-${{ github.ref_name }}-${{ matrix.goos }}-amd64
           path: dist/*
 
   release:
