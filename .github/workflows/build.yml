@@ -54,6 +54,16 @@ jobs:
           BIN="kbo-explorer-${VERSION}-${GOOS}-amd64${{ matrix.ext }}"
           go build -o "dist/$BIN" ./private/explorer_cli/
 
+      - name: Build explorer HTTP server
+        shell: bash
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: amd64
+          VERSION: ${{ github.ref_name }}
+        run: |
+          BIN="kbo-explorer-http-${VERSION}-${GOOS}-amd64${{ matrix.ext }}"
+          go build -o "dist/$BIN" ./private/explorer_http/
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:

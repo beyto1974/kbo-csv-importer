@@ -92,6 +92,22 @@ kbo-explorer --driver="sqlite" --dsn="file:mydb.db?cache=shared&mode=rwc" --ente
 - [2.003.015.769] Group: Activité TVA | NACE 61200: Télécommunications sans fil | Version: Nace 2008
 ```
 
+## Explorer HTTP server
+
+This is a simple REST server, usefull for integrations.
+
+Start the server:
+
+```bash
+kbo-explorer-http --driver="sqlite" --dsn="file:mydb.db?cache=shared&mode=rwc" --enterpriseNumber="0200.065.765" --language=FR --port=8080
+```
+
+Endpoint:
+
+```bash
+GET /entity/{entityNumber}
+```
+
 ## Required CSV Files
 
 ```
