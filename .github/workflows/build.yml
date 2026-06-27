@@ -52,7 +52,7 @@ jobs:
           VERSION: ${{ github.ref_name }}
         run: |
           BIN="kbo-explorer-${VERSION}-${GOOS}-amd64${{ matrix.ext }}"
-          go build -o "dist/$BIN" ./private/explorer/
+          go build -o "dist/$BIN" ./private/explorer_cli/
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4

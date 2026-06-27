@@ -2,6 +2,7 @@ package main
 
 import (
 	"beyto1974/kbo-csv-importer/private/db"
+	"beyto1974/kbo-csv-importer/private/explorer"
 	"beyto1974/kbo-csv-importer/private/explorer_config"
 	"context"
 	"fmt"
@@ -21,11 +22,11 @@ func main() {
 
 	ctx := context.Background()
 
-	response, err := LoadEnterpriseBundle(ctx, bunDB, config.EnterpriseNumber, config.Language)
+	response, err := explorer.LoadEnterpriseBundle(ctx, bunDB, config.EnterpriseNumber, config.Language)
 	if err != nil {
 		fmt.Printf("Error retrieving bundle: %v\n", err)
 		os.Exit(1)
 	}
 
-	fmt.Println(FormatEnterpriseLLM(response))
+	fmt.Println(explorer.FormatEnterpriseLLM(response))
 }

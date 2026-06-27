@@ -1,4 +1,4 @@
-package main
+package explorer
 
 import (
 	"beyto1974/kbo-csv-importer/private/db"
